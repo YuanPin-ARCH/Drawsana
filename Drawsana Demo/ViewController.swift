@@ -359,9 +359,24 @@ extension ViewController: SelectionToolDelegate {
 extension ViewController: TextToolDelegate {
   /// Don't modify text point. In reality you probably do want to modify it to
   /// make sure it's not below the keyboard.
-  func textToolPointForNewText(tappedPoint: CGPoint) -> CGPoint {
-    return tappedPoint
-  }
+//  func textToolPointForNewText(tappedPoint: CGPoint) -> CGPoint {
+//    return tappedPoint
+//  }
+    
+    func textToolPointForNewText(tappedPoint: CGPoint) -> CGPoint {
+      return tappedPoint
+    }
+    
+    func textToolPointForNewText(tappedPoint: CGPoint, textTool: TextTool) -> CGPoint {
+//        textTool.selectedShape?.isBeingEdited = true
+        textTool.editingView.textView.text = "YES"
+//        textTool.editingView.textView.resignFirstResponder()
+        guard let shape = textTool.selectedShape else { return tappedPoint }
+        shape.text = textTool.editingView.textView.text ?? ""
+        textTool.updateShapeFrame()
+        textTool.shapeUpdater?.rerenderAllShapesInefficiently()
+        return tappedPoint
+    }
 
   /// When user taps away from text, switch to the selection tool so they can
   /// tap anything they want.
@@ -380,7 +395,6 @@ extension ViewController: TextToolDelegate {
     //
     // The anchor point is changed so that the controls can be scaled correctly
     // in `textToolDidUpdateEditingViewTransform`.
-
     let makeView: (UIImage?) -> UIView = {
       let view = UIView()
       view.translatesAutoresizingMaskIntoConstraints = false
@@ -417,7 +431,7 @@ extension ViewController: TextToolDelegate {
         deleteControlView.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -3 + halfButtonSize),
       ])
     }
-
+/*
     editingView.addControl(dragActionType: .resizeAndRotate, view: makeView(UIImage(named: "icon_resize_rotate"))) { (textView, resizeAndRotateControlView) in
       resizeAndRotateControlView.layer.anchorPoint = CGPoint(x: 0, y: 0)
       NSLayoutConstraint.activate([
@@ -427,7 +441,7 @@ extension ViewController: TextToolDelegate {
         resizeAndRotateControlView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 4 - halfButtonSize),
       ])
     }
-
+*/
     editingView.addControl(dragActionType: .changeWidth, view: makeView(UIImage(named: "icon_change_width"))) { (textView, changeWidthControlView) in
       changeWidthControlView.layer.anchorPoint = CGPoint(x: 0, y: 1)
       NSLayoutConstraint.activate([

@@ -14,6 +14,7 @@ public protocol TextToolDelegate: AnyObject {
   /// shape should be created. You might want to set it to a specific point, or
   /// make sure it's above the keyboard.
   func textToolPointForNewText(tappedPoint: CGPoint) -> CGPoint
+    func textToolPointForNewText(tappedPoint: CGPoint, textTool: TextTool) -> CGPoint
 
   /// User tapped away from the active text shape. If you give users access to
   /// the selection tool, you might want to set it as the active tool at this
@@ -51,12 +52,12 @@ public class TextTool: NSObject, DrawingTool {
   /// The text tool has 3 different behaviors on drag depending on where your
   /// touch starts. See `DragHandler.swift` for their implementations.
   private var dragHandler: DragHandler?
-  private var selectedShape: TextShape?
+  public var selectedShape: TextShape?
   private var originalText = ""
   private var maxWidth: CGFloat = 320  // updated from drawing.size
-  private weak var shapeUpdater: DrawsanaViewShapeUpdating?
+  public weak var shapeUpdater: DrawsanaViewShapeUpdating?
   // internal for use by DragHandler subclasses
-  internal lazy var editingView: TextShapeEditingView = makeTextView()
+  public lazy var editingView: TextShapeEditingView = makeTextView()
 
   public init(delegate: TextToolDelegate? = nil) {
     super.init()
@@ -111,7 +112,8 @@ public class TextTool: NSObject, DrawingTool {
       let newShape = TextShape()
       newShape.apply(userSettings: context.userSettings)
       self.selectedShape = newShape
-      newShape.transform.translation = delegate?.textToolPointForNewText(tappedPoint: point) ?? point
+//      newShape.transform.translation = delegate?.textToolPointForNewText(tappedPoint: point) ?? point
+        newShape.transform.translation = delegate?.textToolPointForNewText(tappedPoint: point, textTool: self) ?? point
       beginEditing(shape: newShape, context: context)
       context.operationStack.apply(operation: AddShapeOperation(shape: newShape))
     }
@@ -228,7 +230,7 @@ public class TextTool: NSObject, DrawingTool {
 
   // MARK: Other helpers
 
-  func updateShapeFrame() {
+  public func updateShapeFrame() {
     guard let shape = selectedShape else { return }
     shape.boundingRect = computeBounds()
     // Shape jumps a little after editing unless we add this fudge factor
@@ -303,6 +305,8 @@ public class TextTool: NSObject, DrawingTool {
 
   private func makeTextView() -> TextShapeEditingView {
     let textView = UITextView()
+    textView.isEditable = false
+    
     textView.autoresizingMask = [.flexibleRightMargin, .flexibleBottomMargin]
     textView.textContainerInset = .zero
     textView.contentInset = .zero
