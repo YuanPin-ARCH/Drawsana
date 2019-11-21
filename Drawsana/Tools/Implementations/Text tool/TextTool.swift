@@ -268,7 +268,9 @@ public class TextTool: NSObject, DrawingTool {
     if let explicitWidth = shape.explicitWidth {
       textSize.width = explicitWidth
     }
-    textSize.width = max(textSize.width, 44)
+//    textSize.width = max(textSize.width, 44)
+    textSize.width = max(44, textSize.height)
+
     let origin = CGPoint(x: -textSize.width / 2, y: -textSize.height / 2)
     var rect = CGRect(origin: origin, size: textSize)
 
