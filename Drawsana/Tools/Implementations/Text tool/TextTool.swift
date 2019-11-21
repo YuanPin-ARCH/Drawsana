@@ -268,8 +268,7 @@ public class TextTool: NSObject, DrawingTool {
     if let explicitWidth = shape.explicitWidth {
       textSize.width = explicitWidth
     }
-//    textSize.width = max(textSize.width, 44)
-    textSize.width = max(44, textSize.height)
+    textSize.width = min(textSize.width, 34)
 
     let origin = CGPoint(x: -textSize.width / 2, y: -textSize.height / 2)
     var rect = CGRect(origin: origin, size: textSize)
@@ -300,7 +299,7 @@ public class TextTool: NSObject, DrawingTool {
     }
 
     var finalSize = editingView.sizeThatFits(CGSize(width: rect.size.width, height: .infinity))
-    finalSize.width = max(finalSize.width, 44)
+    finalSize.width = min(finalSize.width, 34)
     let finalOrigin = CGPoint(x: -finalSize.width / 2, y: -finalSize.height / 2)
     return CGRect(origin: finalOrigin, size: finalSize)
   }
